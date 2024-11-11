@@ -10,19 +10,19 @@
 (function() {
     'use strict';
 
-    // 变量用于存储用于隐藏 feed 的样式元素
+    // Variable to store the style element used for hiding the feed
     let feedStyleElement = null;
 
-    // 函数：检查当前是否在主页
+    // Function: Check if we are currently on the homepage
     function isHomePage() {
-        // 主页的路径通常是 '/'，或者以 '/explore' 开头
+        // The homepage path is usually '/', or starts with '/explore'
         return window.location.pathname === '/' || window.location.pathname.startsWith('/explore');
     }
 
-    // 函数：注入全局 CSS 样式
+    // Function: Inject global CSS styles
     function injectGlobalCSS() {
         const css = `
-        /* 全局隐藏的元素 */
+        /* Globally hidden elements */
         .side-bar,
         .mask-paper > .right,
         button[class*="channel-btn"] {
@@ -37,12 +37,12 @@
         document.head.appendChild(style);
     }
 
-    // 函数：根据当前页面动态添加或移除用于隐藏 feed 的 CSS
+    // Function: Dynamically add or remove CSS to hide the feed based on the current page
     function updateFeedHidingCSS() {
         if (isHomePage()) {
             if (!feedStyleElement) {
                 const homePageCSS = `
-                /* 仅在主页隐藏 feed 元素 */
+                /* Hide feed elements only on the homepage */
                 .feeds-container,
                 .channel-scroll-container {
                     display: none !important;
@@ -62,10 +62,10 @@
         }
     }
 
-    // 函数：观察 DOM 变化
+    // Function: Observe DOM changes
     function observeDOM() {
         const observer = new MutationObserver(() => {
-            // 当 DOM 发生变化时，更新 feed 隐藏状态并隐藏全局元素
+            // When the DOM changes, update the feed hiding status and hide global elements
             updateFeedHidingCSS();
             hideGlobalElements();
         });
@@ -73,7 +73,7 @@
         observer.observe(document.body, { childList: true, subtree: true });
     }
 
-    // 函数：隐藏全局元素
+    // Function: Hide global elements
     function hideGlobalElements() {
         const globalSelectors = [
             '.side-bar',
@@ -91,18 +91,18 @@
         });
     }
 
-    // 初始执行
+    // Initial execution
     injectGlobalCSS();
     updateFeedHidingCSS();
     hideGlobalElements();
     observeDOM();
 
-    // 监听 URL 变化
+    // Listen for URL changes
     function onUrlChange() {
         updateFeedHidingCSS();
     }
 
-    // 重写 history.pushState 和 history.replaceState，以检测站内导航
+    // Override history.pushState and history.replaceState to detect in-site navigation
     (function(history){
         const pushState = history.pushState;
         history.pushState = function(state) {
@@ -118,7 +118,7 @@
         };
     })(window.history);
 
-    // 监听 popstate 事件（用于处理浏览器的前进和后退）
+    // Listen for the popstate event (for handling browser forward and back buttons)
     window.addEventListener('popstate', function() {
         onUrlChange();
     });
