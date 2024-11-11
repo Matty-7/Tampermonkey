@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Xiaohongshu Feed Hider and Button Remover
 // @namespace    http://tampermonkey.net/
-// @version      0.9
-// @description  Hide feed on homepage, keep search results, and remove specific button globally
+// @version      1.0
+// @description  Hide feed on homepage, keep search results, and remove specific buttons globally
 // @match        https://www.xiaohongshu.com/*
 // @grant        none
 // ==/UserScript==
@@ -25,9 +25,9 @@
         }
     }
 
-    // Function to hide the specific buttons globally
+    // Function to hide specific elements globally
     function hideButtonGlobally() {
-        // Hide the specific button with class .text.large.channel-btn.reds-button-new
+        // Hide the button with class .text.large.channel-btn.reds-button-new
         const targetButton = document.querySelector('.text.large.channel-btn.reds-button-new');
         if (targetButton) {
             targetButton.style.display = 'none';
@@ -38,12 +38,18 @@
         if (maskPaperRight) {
             maskPaperRight.style.display = 'none';
         }
+
+        // Hide the sidebar with class .side-bar
+        const sideBar = document.querySelector('.side-bar');
+        if (sideBar) {
+            sideBar.style.display = 'none';
+        }
     }
 
     // Set up MutationObserver to dynamically hide elements as they load
     const observer = new MutationObserver(() => {
         hideFeed(); // Hide the feed container on homepage
-        hideButtonGlobally(); // Hide the specific buttons globally
+        hideButtonGlobally(); // Hide specific elements globally
     });
 
     // Start observing changes to the entire document body
