@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Xiaohongshu Feed Hider and Button Remover
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.9
 // @description  Hide feed on homepage, keep search results, and remove specific button globally
 // @match        https://www.xiaohongshu.com/*
 // @grant        none
@@ -10,7 +10,7 @@
 (function() {
     'use strict';
 
-    // Function to hide specific containers on the homepage
+    // Function to hide feed container on homepage
     function hideFeed() {
         if (window.location.href.includes("homefeed_recommend")) {
             const feedContainer = document.querySelector('.feeds-container');
@@ -25,27 +25,41 @@
         }
     }
 
-    // Function to hide the button globally
+    // Function to hide the specific buttons globally
     function hideButtonGlobally() {
+        // Hide the specific button with class .text.large.channel-btn.reds-button-new
         const targetButton = document.querySelector('.text.large.channel-btn.reds-button-new');
         if (targetButton) {
             targetButton.style.display = 'none';
         }
+
+        // Hide the element with class .mask-paper > .right
+        const maskPaperRight = document.querySelector('.mask-paper > .right');
+        if (maskPaperRight) {
+            maskPaperRight.style.display = 'none';
+        }
     }
 
-    // Run hideFeed and hideButtonGlobally immediately when the script loads
+    // Set up MutationObserver to dynamically hide elements as they load
+    const observer = new MutationObserver(() => {
+        hideFeed(); // Hide the feed container on homepage
+        hideButtonGlobally(); // Hide the specific buttons globally
+    });
+
+    // Start observing changes to the entire document body
+    observer.observe(document.body, {
+        childList: true, // Watch for new elements added
+        subtree: true // Include all descendants
+    });
+
+    // Run immediately on page load to hide elements that are already present
     hideFeed();
     hideButtonGlobally();
 
-    // Also set intervals to check repeatedly in case elements load with delay
-    const feedCheckInterval = setInterval(hideFeed, 500); // Check every 500 ms on homepage
-    const buttonCheckInterval = setInterval(hideButtonGlobally, 500); // Check every 500 ms globally
-
-    // Stop the intervals once DOM is fully loaded and we ensure elements are hidden
-    document.addEventListener("DOMContentLoaded", () => {
+    // Stop observing after page fully loads
+    window.addEventListener("load", () => {
         hideFeed();
         hideButtonGlobally();
-        clearInterval(feedCheckInterval);
-        clearInterval(buttonCheckInterval);
+        observer.disconnect(); // Stop observing once elements are hidden
     });
 })();
